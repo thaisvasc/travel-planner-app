@@ -1,0 +1,301 @@
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #3ea5e9, #abc5df);
+  padding: 40px 20px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 3rem;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: #475569;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 24px;
+}
+
+.form-section,
+.trips-section {
+  background-color: rgb(253, 253, 253);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.form-section h2,
+.trips-section h2 {
+  font-size: 1.5rem;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.form-section p,
+.trips-section p {
+  color: #64748b;
+  line-height: 1.5;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.add-btn:hover {
+  opacity: 0.95;
+}
+
+.trip-card {
+  background: white;
+  padding: 18px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-left: 5px solid #2563eb;
+  transition: transform 0.2s ease;
+}
+
+.trip-card:hover {
+  transform: translateY(-3px);
+}
+
+.delete-btn {
+  margin-top: 12px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  width: auto;
+  font-weight: bold;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+select {
+  width: 100%;
+  padding: 13px;
+  margin-bottom: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+}
+
+.trip-card h3 {
+  font-size: 1.3rem;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.trip-details {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trip-details p {
+  margin-bottom: 8px;
+}
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #334155;
+}
+.trip-details {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trip-details h4 {
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 13px;
+  margin-bottom: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+}
+.trip-details {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trip-details h4 {
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 13px;
+  margin-bottom: 14px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #f8fafc;
+  resize: vertical;
+  font-family: Arial, sans-serif;
+}
+
+.inline-field {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.inline-field input {
+  margin-bottom: 0;
+}
+
+.small-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.small-btn:hover {
+  background: #1d4ed8;
+}
+
+.item-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 8px;
+}
+
+.list-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.remove-btn {
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.remove-btn:hover {
+  background: #d97706;
+}
+.trip-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.trip-duration {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.trip-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px 18px;
+  margin-bottom: 8px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-badge.planned {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-badge.booked {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.status-badge.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+.toggle-btn {
+  margin-top: 14px;
+  background: #0f172a;
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+}
+
+.toggle-btn:hover {
+  background: #1e293b;
+}
