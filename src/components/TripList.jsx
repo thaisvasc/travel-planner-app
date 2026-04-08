@@ -5,12 +5,8 @@ function TripList({
   deleteTrip,
   updateTripField,
   updateTransportField,
-  addAttraction,
-  removeAttraction,
-  addRestaurant,
-  removeRestaurant,
 }) {
-  const [openTripIndex, setOpenTripIndex] = useState(null);
+  const [openTripId, setOpenTripId] = useState(null);
 
   const calculateTripDays = (startDate, endDate) => {
     if (!startDate || !endDate) return 0;
@@ -37,8 +33,8 @@ function TripList({
     }
   };
 
-  const toggleTripDetails = (index) => {
-    setOpenTripIndex(openTripIndex === index ? null : index);
+  const toggleTripDetails = (tripId) => {
+    setOpenTripId(openTripId === tripId ? null : tripId);
   };
 
   return (
@@ -48,8 +44,8 @@ function TripList({
       {trips.length === 0 ? (
         <p>Nenhuma viagem adicionada ainda.</p>
       ) : (
-        trips.map((trip, index) => (
-          <div key={index} className="trip-card">
+        trips.map((trip) => (
+          <div key={trip.id} className="trip-card">
             <div className="trip-card-header">
               <div>
                 <h3>{trip.destination}</h3>
@@ -71,12 +67,12 @@ function TripList({
 
             <button
               className="toggle-btn"
-              onClick={() => toggleTripDetails(index)}
+              onClick={() => toggleTripDetails(trip.id)}
             >
-              {openTripIndex === index ? "Fechar detalhes" : "Ver detalhes"}
+              {openTripId === trip.id ? "Fechar detalhes" : "Ver detalhes"}
             </button>
 
-            {openTripIndex === index && (
+            {openTripId === trip.id && (
               <>
                 <div className="trip-details">
                   <h4>Planejamento</h4>
@@ -87,7 +83,7 @@ function TripList({
                     placeholder="Ex: LATAM"
                     value={trip.transport?.airline || ""}
                     onChange={(e) =>
-                      updateTransportField(index, "airline", e.target.value)
+                      updateTransportField(trip.id, "airline", e.target.value)
                     }
                   />
 
@@ -97,7 +93,7 @@ function TripList({
                     placeholder="Ex: Hotel no centro"
                     value={trip.accommodation || ""}
                     onChange={(e) =>
-                      updateTripField(index, "accommodation", e.target.value)
+                      updateTripField(trip.id, "accommodation", e.target.value)
                     }
                   />
 
@@ -106,96 +102,14 @@ function TripList({
                     placeholder="Observações sobre a viagem"
                     value={trip.notes || ""}
                     onChange={(e) =>
-                      updateTripField(index, "notes", e.target.value)
+                      updateTripField(trip.id, "notes", e.target.value)
                     }
                   />
                 </div>
 
-                <div className="trip-details">
-                  <h4>Pontos turísticos</h4>
-
-                  <div className="inline-field">
-                    <input
-                      type="text"
-                      placeholder="Adicionar ponto turístico"
-                      value={trip.newAttraction || ""}
-                      onChange={(e) =>
-                        updateTripField(index, "newAttraction", e.target.value)
-                      }
-                    />
-                    <button
-                      className="small-btn"
-                      onClick={() => addAttraction(index)}
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-
-                  {trip.attractions.length === 0 ? (
-                    <p>Nenhum ponto turístico adicionado.</p>
-                  ) : (
-                    <ul className="item-list">
-                      {trip.attractions.map((attraction, attractionIndex) => (
-                        <li key={attractionIndex} className="list-item">
-                          <span>{attraction}</span>
-                          <button
-                            className="remove-btn"
-                            onClick={() =>
-                              removeAttraction(index, attractionIndex)
-                            }
-                          >
-                            Remover
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                <div className="trip-details">
-                  <h4>Locais para comer</h4>
-
-                  <div className="inline-field">
-                    <input
-                      type="text"
-                      placeholder="Adicionar restaurante ou café"
-                      value={trip.newRestaurant || ""}
-                      onChange={(e) =>
-                        updateTripField(index, "newRestaurant", e.target.value)
-                      }
-                    />
-                    <button
-                      className="small-btn"
-                      onClick={() => addRestaurant(index)}
-                    >
-                      Adicionar
-                    </button>
-                  </div>
-
-                  {trip.restaurants.length === 0 ? (
-                    <p>Nenhum local para comer adicionado.</p>
-                  ) : (
-                    <ul className="item-list">
-                      {trip.restaurants.map((restaurant, restaurantIndex) => (
-                        <li key={restaurantIndex} className="list-item">
-                          <span>{restaurant}</span>
-                          <button
-                            className="remove-btn"
-                            onClick={() =>
-                              removeRestaurant(index, restaurantIndex)
-                            }
-                          >
-                            Remover
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
                 <button
                   className="delete-btn"
-                  onClick={() => deleteTrip(index)}
+                  onClick={() => deleteTrip(trip.id)}
                 >
                   Excluir viagem
                 </button>

@@ -1,5 +1,6 @@
 import "./App.css";
 import { useEffect, useState } from "react";
+import { supabase } from "./supabase";
 import TripForm from "./components/TripForm";
 import TripList from "./components/TripList";
 
@@ -9,88 +10,139 @@ function App() {
   const [endDate, setEndDate] = useState("");
   const [budget, setBudget] = useState("");
   const [status, setStatus] = useState("");
+  const [trips, setTrips] = useState([]);
 
-  const [trips, setTrips] = useState(() => {
-    const savedTrips = localStorage.getItem("trips");
-    const parsedTrips = savedTrips ? JSON.parse(savedTrips) : [];
+  useEffect(() => {
+    fetchTrips();
+  }, []);
 
-    return parsedTrips.map((trip) => ({
+  const fetchTrips = async () => {
+    const { data, error } = await supabase
+      .from("trips")
+      .select("*")
+      .order("id", { ascending: false });
+
+    if (error) {
+      console.error("Erro ao buscar viagens:", error.message);
+      return;
+    }
+
+    const formattedTrips = data.map((trip) => ({
+      id: trip.id,
       destination: trip.destination || "",
-      startDate: trip.startDate || "",
-      endDate: trip.endDate || "",
+      startDate: trip.start_date || "",
+      endDate: trip.end_date || "",
       budget: trip.budget || "",
       status: trip.status || "",
       transport: {
-        airline: trip.transport?.airline || "",
+        airline: trip.airline || "",
       },
       accommodation: trip.accommodation || "",
-      attractions: trip.attractions || [],
-      restaurants: trip.restaurants || [],
+      attractions: [],
+      restaurants: [],
       notes: trip.notes || "",
       newAttraction: "",
       newRestaurant: "",
     }));
-  });
 
-  useEffect(() => {
-    localStorage.setItem("trips", JSON.stringify(trips));
-  }, [trips]);
+    setTrips(formattedTrips);
+  };
 
-  const addTrip = () => {
+  const addTrip = async () => {
     if (!destination || !startDate || !endDate || !budget || !status) {
       alert("Preencha todos os campos.");
       return;
     }
 
-    const newTrip = {
-      destination,
-      startDate,
-      endDate,
-      budget,
-      status,
-      transport: {
+    const { error } = await supabase.from("trips").insert([
+      {
+        destination,
+        start_date: startDate,
+        end_date: endDate,
+        budget,
+        status,
         airline: "",
+        accommodation: "",
+        notes: "",
       },
-      accommodation: "",
-      attractions: [],
-      restaurants: [],
-      notes: "",
-      newAttraction: "",
-      newRestaurant: "",
-    };
+    ]);
 
-    setTrips((prevTrips) => [...prevTrips, newTrip]);
+    if (error) {
+      console.error("Erro ao salvar viagem:", error.message);
+      alert("Não foi possível salvar a viagem.");
+      return;
+    }
 
     setDestination("");
     setStartDate("");
     setEndDate("");
     setBudget("");
     setStatus("");
+
+    fetchTrips();
   };
 
-  const deleteTrip = (indexToDelete) => {
-    setTrips((prevTrips) =>
-      prevTrips.filter((_, index) => index !== indexToDelete)
-    );
+  const deleteTrip = async (tripId) => {
+    const { error } = await supabase.from("trips").delete().eq("id", tripId);
+
+    if (error) {
+      console.error("Erro ao excluir viagem:", error.message);
+      return;
+    }
+
+    fetchTrips();
   };
 
-  const updateTripField = (tripIndex, field, value) => {
+  const updateTripField = async (tripId, field, value) => {
+    const columnMap = {
+      accommodation: "accommodation",
+      notes: "notes",
+      status: "status",
+      budget: "budget",
+      destination: "destination",
+    };
+
+    const dbField = columnMap[field];
+    if (!dbField) return;
+
+    const { error } = await supabase
+      .from("trips")
+      .update({ [dbField]: value })
+      .eq("id", tripId);
+
+    if (error) {
+      console.error("Erro ao atualizar viagem:", error.message);
+      return;
+    }
+
     setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex ? { ...trip, [field]: value } : trip
+      prevTrips.map((trip) =>
+        trip.id === tripId ? { ...trip, [field]: value } : trip
       )
     );
   };
 
-  const updateTransportField = (tripIndex, field, value) => {
+  const updateTransportField = async (tripId, field, value) => {
+    if (field !== "airline") return;
+
+    const { error } = await supabase
+      .from("trips")
+      .update({ airline: value })
+      .eq("id", tripId);
+
+    if (error) {
+      console.error("Erro ao atualizar companhia aérea:", error.message);
+      return;
+    }
+
     setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex
+      prevTrips.map((trip) =>
+        trip.id === tripId
           ? {
               ...trip,
               transport: {
                 ...trip.transport,
-                [field]: value,
+                airline: value,
               },
             }
           : trip
@@ -98,71 +150,10 @@ function App() {
     );
   };
 
-  const addAttraction = (tripIndex) => {
-    const attraction = trips[tripIndex].newAttraction.trim();
-
-    if (!attraction) return;
-
-    setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex
-          ? {
-              ...trip,
-              attractions: [...trip.attractions, attraction],
-              newAttraction: "",
-            }
-          : trip
-      )
-    );
-  };
-
-  const removeAttraction = (tripIndex, attractionIndex) => {
-    setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex
-          ? {
-              ...trip,
-              attractions: trip.attractions.filter(
-                (_, index) => index !== attractionIndex
-              ),
-            }
-          : trip
-      )
-    );
-  };
-
-  const addRestaurant = (tripIndex) => {
-    const restaurant = trips[tripIndex].newRestaurant.trim();
-
-    if (!restaurant) return;
-
-    setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex
-          ? {
-              ...trip,
-              restaurants: [...trip.restaurants, restaurant],
-              newRestaurant: "",
-            }
-          : trip
-      )
-    );
-  };
-
-  const removeRestaurant = (tripIndex, restaurantIndex) => {
-    setTrips((prevTrips) =>
-      prevTrips.map((trip, index) =>
-        index === tripIndex
-          ? {
-              ...trip,
-              restaurants: trip.restaurants.filter(
-                (_, index) => index !== restaurantIndex
-              ),
-            }
-          : trip
-      )
-    );
-  };
+  const addAttraction = () => {};
+  const removeAttraction = () => {};
+  const addRestaurant = () => {};
+  const removeRestaurant = () => {};
 
   return (
     <div className="app">
