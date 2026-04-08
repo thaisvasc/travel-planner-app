@@ -158,41 +158,69 @@ function App() {
   const addRestaurant = () => {};
   const removeRestaurant = () => {};
 
-  return (
-    <div className="app">
-      <header className="header">
-        <h1>Travel Planner</h1>
-        <p>Organize suas viagens de forma simples e prática</p>
-      </header>
+return (
+  <div className="app">
+    <header className="header">
+      <div>
+        <p className="mini-title">Travel Planner</p>
+        <h1>Organize suas viagens com visual profissional</h1>
+        <p className="header-subtitle">
+          Planeje destinos, orçamento, datas e detalhes em um só lugar.
+        </p>
+      </div>
 
-      <main className="container">
-        <TripForm
-          destination={destination}
-          setDestination={setDestination}
-          startDate={startDate}
-          setStartDate={setStartDate}
-          endDate={endDate}
-          setEndDate={setEndDate}
-          budget={budget}
-          setBudget={setBudget}
-          status={status}
-          setStatus={setStatus}
-          addTrip={addTrip}
-        />
+      <button className="header-btn">+ Nova viagem</button>
+    </header>
 
-        <TripList
-          trips={trips}
-          deleteTrip={deleteTrip}
-          updateTripField={updateTripField}
-          updateTransportField={updateTransportField}
-          addAttraction={addAttraction}
-          removeAttraction={removeAttraction}
-          addRestaurant={addRestaurant}
-          removeRestaurant={removeRestaurant}
-        />
-      </main>
-    </div>
-  );
+    <section className="dashboard">
+      <div className="dashboard-card">
+        <span>Total de viagens</span>
+        <strong>{trips.length}</strong>
+      </div>
+
+      <div className="dashboard-card">
+        <span>Planejadas</span>
+        <strong>
+          {trips.filter((trip) => trip.status === "Planejada").length}
+        </strong>
+      </div>
+
+      <div className="dashboard-card">
+        <span>Reservadas</span>
+        <strong>
+          {trips.filter((trip) => trip.status === "Reservada").length}
+        </strong>
+      </div>
+    </section>
+
+    <main className="container">
+      <TripForm
+        destination={destination}
+        setDestination={setDestination}
+        startDate={startDate}
+        setStartDate={setStartDate}
+        endDate={endDate}
+        setEndDate={setEndDate}
+        budget={budget}
+        setBudget={setBudget}
+        status={status}
+        setStatus={setStatus}
+        addTrip={addTrip}
+      />
+
+      <TripList
+        trips={trips}
+        deleteTrip={deleteTrip}
+        updateTripField={updateTripField}
+        updateTransportField={updateTransportField}
+        addAttraction={addAttraction}
+        removeAttraction={removeAttraction}
+        addRestaurant={addRestaurant}
+        removeRestaurant={removeRestaurant}
+      />
+    </main>
+  </div>
+);
 }
 
 export default App;

@@ -1,24 +1,94 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Inter, Arial, sans-serif;
+}
+
 .app {
   min-height: 100vh;
-  background: linear-gradient(135deg, #e93e77, #abc5df);
+  background: linear-gradient(180deg, #eef4ff 0%, #f8fafc 50%, #f1f5f9 100%);
   padding: 40px 20px;
 }
 
+/* HEADER */
+
 .header {
-  text-align: center;
-  margin-bottom: 40px;
+  max-width: 1100px;
+  margin: 0 auto 32px auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.mini-title {
+  color: #2563eb;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
 }
 
 .header h1 {
-  font-size: 3rem;
+  font-size: 2.4rem;
   color: #0f172a;
   margin-bottom: 10px;
 }
 
-.header p {
-  font-size: 1.1rem;
-  color: #475569;
+.header-subtitle {
+  color: #64748b;
+  line-height: 1.5;
 }
+
+.header-btn {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.header-btn:hover {
+  background: #1d4ed8;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+  max-width: 1100px;
+  margin: 0 auto 28px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.dashboard-card {
+  background: white;
+  padding: 22px;
+  border-radius: 18px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.06);
+}
+
+.dashboard-card span {
+  display: block;
+  color: #64748b;
+  margin-bottom: 8px;
+}
+
+.dashboard-card strong {
+  font-size: 1.8rem;
+  color: #0f172a;
+}
+
+/* MAIN GRID */
 
 .container {
   max-width: 1100px;
@@ -28,36 +98,59 @@
   gap: 24px;
 }
 
+/* FORM + LIST */
+
 .form-section,
 .trips-section {
-  background-color: rgb(253, 253, 253);
-  border-radius: 18px;
+  background: white;
+  border-radius: 22px;
   padding: 24px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
 }
 
 .form-section h2,
 .trips-section h2 {
   font-size: 1.5rem;
   color: #0f172a;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
-.form-section p,
-.trips-section p {
-  color: #64748b;
-  line-height: 1.5;
+/* INPUTS */
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #334155;
 }
 
-input {
+input,
+select,
+textarea {
   width: 100%;
   padding: 13px;
   margin-bottom: 14px;
   border: 1px solid #dbeafe;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 1rem;
   background-color: #f8fafc;
+  transition: 0.2s ease;
 }
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #2563eb;
+  background: white;
+  outline: none;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* BUTTONS */
 
 .add-btn {
   width: 100%;
@@ -65,7 +158,7 @@ input {
   background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: 14px;
   font-size: 1rem;
   cursor: pointer;
   font-weight: bold;
@@ -75,171 +168,53 @@ input {
   opacity: 0.95;
 }
 
-.trip-card {
-  background: white;
-  padding: 18px;
-  border-radius: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
-  border-left: 5px solid #2563eb;
-  transition: transform 0.2s ease;
-}
-
-.trip-card:hover {
-  transform: translateY(-3px);
-}
-
 .delete-btn {
   margin-top: 12px;
   background: #ef4444;
   color: white;
   border: none;
   padding: 10px 14px;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  width: auto;
   font-weight: bold;
 }
 
 .delete-btn:hover {
   background: #dc2626;
 }
-select {
-  width: 100%;
-  padding: 13px;
-  margin-bottom: 14px;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  font-size: 1rem;
-  background-color: #f8fafc;
-}
 
-.trip-card h3 {
-  font-size: 1.3rem;
-  color: #0f172a;
-  margin-bottom: 12px;
-}
-
-.trip-details {
+.toggle-btn {
   margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.trip-details p {
-  margin-bottom: 8px;
-}
-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: #334155;
-}
-.trip-details {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.trip-details h4 {
-  margin-bottom: 12px;
-  color: #1e293b;
-}
-
-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 13px;
-  margin-bottom: 14px;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  font-size: 1rem;
-  background-color: #f8fafc;
-  resize: vertical;
-  font-family: Arial, sans-serif;
-}
-.trip-details {
-  margin-top: 16px;
-  padding-top: 14px;
-  border-top: 1px solid #e2e8f0;
-}
-
-.trip-details h4 {
-  margin-bottom: 12px;
-  color: #1e293b;
-}
-
-textarea {
-  width: 100%;
-  min-height: 100px;
-  padding: 13px;
-  margin-bottom: 14px;
-  border: 1px solid #dbeafe;
-  border-radius: 10px;
-  font-size: 1rem;
-  background-color: #f8fafc;
-  resize: vertical;
-  font-family: Arial, sans-serif;
-}
-
-.inline-field {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.inline-field input {
-  margin-bottom: 0;
-}
-
-.small-btn {
-  background: #2563eb;
+  background: #0f172a;
   color: white;
   border: none;
   padding: 12px 14px;
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  white-space: nowrap;
+  width: 100%;
 }
 
-.small-btn:hover {
-  background: #1d4ed8;
+.toggle-btn:hover {
+  background: #1e293b;
 }
 
-.item-list {
-  list-style: none;
-  padding-left: 0;
-  margin-top: 8px;
+/* TRIP CARD */
+
+.trip-card {
+  background: white;
+  padding: 22px;
+  border-radius: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+  border-left: 5px solid #2563eb;
+  transition: all 0.25s ease;
 }
 
-.list-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
+.trip-card:hover {
+  transform: translateY(-4px);
 }
 
-.remove-btn {
-  background: #f59e0b;
-  color: white;
-  border: none;
-  padding: 8px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-}
-
-.remove-btn:hover {
-  background: #d97706;
-}
 .trip-card-header {
   display: flex;
   justify-content: space-between;
@@ -248,11 +223,18 @@ textarea {
   margin-bottom: 14px;
 }
 
+.trip-card h3 {
+  font-size: 1.3rem;
+  color: #0f172a;
+}
+
 .trip-duration {
   margin-top: 4px;
   color: #64748b;
   font-size: 0.95rem;
 }
+
+/* INFO GRID */
 
 .trip-info-grid {
   display: grid;
@@ -260,6 +242,21 @@ textarea {
   gap: 10px 18px;
   margin-bottom: 8px;
 }
+
+/* DETAILS */
+
+.trip-details {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.trip-details h4 {
+  margin-bottom: 12px;
+  color: #1e293b;
+}
+
+/* STATUS */
 
 .status-badge {
   display: inline-block;
@@ -284,18 +281,17 @@ textarea {
   background: #dcfce7;
   color: #15803d;
 }
-.toggle-btn {
-  margin-top: 14px;
-  background: #0f172a;
-  color: white;
-  border: none;
-  padding: 12px 14px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  width: 100%;
-}
 
-.toggle-btn:hover {
-  background: #1e293b;
+/* RESPONSIVO */
+
+@media (max-width: 900px) {
+  .container,
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
