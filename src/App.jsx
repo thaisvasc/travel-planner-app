@@ -21,6 +21,9 @@ function App() {
       .from("trips")
       .select("*")
       .order("id", { ascending: false });
+    
+    console.log("data:", data);
+    console.log("error:", error);
 
     if (error) {
       console.error("Erro ao buscar viagens:", error.message);
