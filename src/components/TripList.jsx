@@ -4,6 +4,7 @@ function TripList({
   trips,
   deleteTrip,
   updateTripField,
+
   updateTransportField,
 }) {
   const [openTripId, setOpenTripId] = useState(null);
@@ -122,4 +123,4 @@ function TripList({
   );
 }
 
-export default TripList;
+export default TripList; 
