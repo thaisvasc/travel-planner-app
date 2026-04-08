@@ -11,6 +11,24 @@ function TripForm({
   setStatus,
   addTrip,
 }) {
+  const handleStartDateChange = (e) => {
+    const newStartDate = e.target.value;
+    setStartDate(newStartDate);
+
+    if (endDate && newStartDate && endDate <= newStartDate) {
+      setEndDate("");
+    }
+  };
+
+  const getMinEndDate = () => {
+    if (!startDate) return "";
+
+    const nextDay = new Date(startDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    return nextDay.toISOString().split("T")[0];
+  };
+
   return (
     <section className="form-section">
       <h2>Nova viagem</h2>
@@ -26,13 +44,15 @@ function TripForm({
       <input
         type="date"
         value={startDate}
-        onChange={(e) => setStartDate(e.target.value)}
+        onChange={handleStartDateChange}
       />
 
-      <label>Data do Fim</label>
+      <label>Data do fim</label>
       <input
         type="date"
         value={endDate}
+        min={getMinEndDate()}
+        disabled={!startDate}
         onChange={(e) => setEndDate(e.target.value)}
       />
 

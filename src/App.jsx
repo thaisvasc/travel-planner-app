@@ -56,6 +56,10 @@ function App() {
       alert("Preencha todos os campos.");
       return;
     }
+    if (new Date(endDate) <= new Date(startDate)) {
+      alert("A data final deve ser maior que a data de início.");
+      return;
+    }
 
     const { error } = await supabase.from("trips").insert([
       {

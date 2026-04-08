@@ -9,6 +9,17 @@ function TripList({
 }) {
   const [openTripId, setOpenTripId] = useState(null);
 
+  const formatCurrencyBRL = (value) => {
+  const numericValue = Number(value);
+
+  if (Number.isNaN(numericValue)) return "R$ 0,00";
+
+  return numericValue.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
   const calculateTripDays = (startDate, endDate) => {
     if (!startDate || !endDate) return 0;
 
@@ -63,7 +74,7 @@ function TripList({
             <div className="trip-info-grid">
               <p><strong>Início:</strong> {trip.startDate}</p>
               <p><strong>Fim:</strong> {trip.endDate}</p>
-              <p><strong>Orçamento:</strong> R$ {trip.budget}</p>
+              <p><strong>Orçamento:</strong> {formatCurrencyBRL(trip.budget)}</p>
             </div>
 
             <button
