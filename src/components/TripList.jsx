@@ -43,7 +43,7 @@ function TripList({ trips, deleteTrip, saveTripEdits }) {
 
   const toggleTripDetails = (tripId) => {
     if (editingTripId === tripId) return;
-    setOpenTripId(openTripId === tripId ? null : tripId);
+    setOpenTripId((prev) => (prev === tripId ? null : tripId));
   };
 
   const startEditing = (trip) => {
@@ -105,9 +105,11 @@ function TripList({ trips, deleteTrip, saveTripEdits }) {
   };
 
   const handleSave = async () => {
+    if (!editedTrip) return;
+
     const result = await saveTripEdits(editedTrip);
 
-    if (result.success) {
+    if (result?.success) {
       setEditingTripId(null);
       setEditedTrip(null);
     }
@@ -123,7 +125,7 @@ function TripList({ trips, deleteTrip, saveTripEdits }) {
         trips.map((trip) => {
           const isOpen = openTripId === trip.id;
           const isEditing = editingTripId === trip.id;
-          const currentTrip = isEditing ? editedTrip : trip;
+          const currentTrip = isEditing && editedTrip ? editedTrip : trip;
 
           return (
             <div key={trip.id} className="trip-card">
@@ -135,7 +137,9 @@ function TripList({ trips, deleteTrip, saveTripEdits }) {
                   </p>
                 </div>
 
-                <span className={getStatusClass(trip.status)}>{trip.status}</span>
+                <span className={getStatusClass(trip.status)}>
+                  {trip.status}
+                </span>
               </div>
 
               <div className="trip-info-grid">
@@ -153,152 +157,158 @@ function TripList({ trips, deleteTrip, saveTripEdits }) {
                 </p>
               </div>
 
-              {!isOpen ? (
+              {!isOpen && (
                 <button
                   className="toggle-btn"
                   onClick={() => toggleTripDetails(trip.id)}
                 >
                   Ver detalhes
                 </button>
-              ) : (
-                <div className="card-actions">
-                  {!isEditing ? (
-                    <>
-                      <button
-                        className="toggle-btn"
-                        onClick={() => toggleTripDetails(trip.id)}
-                      >
-                        Fechar detalhes
-                      </button>
-
-                      <button
-                        className="edit-btn"
-                        onClick={() => startEditing(trip)}
-                      >
-                        Editar viagem
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button className="save-btn" onClick={handleSave}>
-                        Salvar alterações
-                      </button>
-
-                      <button className="cancel-btn" onClick={cancelEditing}>
-                        Cancelar
-                      </button>
-                    </>
-                  )}
-                </div>
               )}
 
               {isOpen && !isEditing && (
-                <div className="trip-details">
-                  <h4>Detalhes da viagem</h4>
+                <>
+                  <div className="card-actions">
+                    <button
+                      className="toggle-btn"
+                      onClick={() => toggleTripDetails(trip.id)}
+                    >
+                      Fechar detalhes
+                    </button>
 
-                  <p>
-                    <strong>Companhia aérea:</strong>{" "}
-                    {trip.transport?.airline || "Não informada"}
-                  </p>
+                    <button
+                      className="edit-btn"
+                      onClick={() => startEditing(trip)}
+                    >
+                      Editar viagem
+                    </button>
+                  </div>
 
-                  <p>
-                    <strong>Hospedagem:</strong>{" "}
-                    {trip.accommodation || "Não informada"}
-                  </p>
+                  <div className="trip-details">
+                    <h4>Detalhes da viagem</h4>
 
-                  <p>
-                    <strong>Notas:</strong> {trip.notes || "Sem observações"}
-                  </p>
+                    <p>
+                      <strong>Companhia aérea:</strong>{" "}
+                      {trip.transport?.airline || "Não informada"}
+                    </p>
 
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteTrip(trip.id)}
-                  >
-                    Excluir viagem
-                  </button>
-                </div>
+                    <p>
+                      <strong>Hospedagem:</strong>{" "}
+                      {trip.accommodation || "Não informada"}
+                    </p>
+
+                    <p>
+                      <strong>Notas:</strong> {trip.notes || "Sem observações"}
+                    </p>
+
+                    <button
+                      className="delete-btn"
+                      onClick={() => deleteTrip(trip.id)}
+                    >
+                      Excluir viagem
+                    </button>
+                  </div>
+                </>
               )}
 
               {isOpen && isEditing && currentTrip && (
-                <div className="trip-details">
-                  <h4>Editar viagem</h4>
+                <>
+                  <div className="card-actions">
+                    <button className="save-btn" onClick={handleSave}>
+                      Salvar alterações
+                    </button>
 
-                  <label>Destino</label>
-                  <input
-                    type="text"
-                    value={currentTrip.destination || ""}
-                    onChange={(e) =>
-                      handleEditChange("destination", e.target.value)
-                    }
-                  />
+                    <button className="cancel-btn" onClick={cancelEditing}>
+                      Cancelar
+                    </button>
+                  </div>
 
-                  <label>Data de início</label>
-                  <input
-                    type="date"
-                    value={currentTrip.startDate || ""}
-                    onChange={(e) => handleStartDateChange(e.target.value)}
-                  />
+                  <div className="trip-details">
+                    <h4>Editar viagem</h4>
 
-                  <label>Data de fim</label>
-                  <input
-                    type="date"
-                    value={currentTrip.endDate || ""}
-                    min={getMinEndDate(currentTrip.startDate)}
-                    disabled={!currentTrip.startDate}
-                    onChange={(e) => handleEditChange("endDate", e.target.value)}
-                  />
+                    <label>Destino</label>
+                    <input
+                      type="text"
+                      value={currentTrip.destination || ""}
+                      onChange={(e) =>
+                        handleEditChange("destination", e.target.value)
+                      }
+                    />
 
-                  <label>Orçamento</label>
-                  <input
-                    type="number"
-                    placeholder="Ex: 3500"
-                    value={currentTrip.budget || ""}
-                    onChange={(e) => handleEditChange("budget", e.target.value)}
-                  />
+                    <label>Data de início</label>
+                    <input
+                      type="date"
+                      value={currentTrip.startDate || ""}
+                      onChange={(e) => handleStartDateChange(e.target.value)}
+                    />
 
-                  <label>Status</label>
-                  <select
-                    value={currentTrip.status || ""}
-                    onChange={(e) => handleEditChange("status", e.target.value)}
-                  >
-                    <option value="">Selecione o status</option>
-                    <option value="Planejada">Planejada</option>
-                    <option value="Reservada">Reservada</option>
-                    <option value="Concluída">Concluída</option>
-                  </select>
+                    <label>Data de fim</label>
+                    <input
+                      type="date"
+                      value={currentTrip.endDate || ""}
+                      min={getMinEndDate(currentTrip.startDate)}
+                      disabled={!currentTrip.startDate}
+                      onChange={(e) =>
+                        handleEditChange("endDate", e.target.value)
+                      }
+                    />
 
-                  <label>Companhia aérea</label>
-                  <input
-                    type="text"
-                    placeholder="Ex: LATAM"
-                    value={currentTrip.transport?.airline || ""}
-                    onChange={(e) => handleAirlineChange(e.target.value)}
-                  />
+                    <label>Orçamento</label>
+                    <input
+                      type="number"
+                      placeholder="Ex: 3500"
+                      value={currentTrip.budget || ""}
+                      onChange={(e) =>
+                        handleEditChange("budget", e.target.value)
+                      }
+                    />
 
-                  <label>Hospedagem</label>
-                  <input
-                    type="text"
-                    placeholder="Ex: Hotel no centro"
-                    value={currentTrip.accommodation || ""}
-                    onChange={(e) =>
-                      handleEditChange("accommodation", e.target.value)
-                    }
-                  />
+                    <label>Status</label>
+                    <select
+                      value={currentTrip.status || ""}
+                      onChange={(e) =>
+                        handleEditChange("status", e.target.value)
+                      }
+                    >
+                      <option value="">Selecione o status</option>
+                      <option value="Planejada">Planejada</option>
+                      <option value="Reservada">Reservada</option>
+                      <option value="Concluída">Concluída</option>
+                    </select>
 
-                  <label>Notas</label>
-                  <textarea
-                    placeholder="Observações sobre a viagem"
-                    value={currentTrip.notes || ""}
-                    onChange={(e) => handleEditChange("notes", e.target.value)}
-                  />
+                    <label>Companhia aérea</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: LATAM"
+                      value={currentTrip.transport?.airline || ""}
+                      onChange={(e) => handleAirlineChange(e.target.value)}
+                    />
 
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteTrip(trip.id)}
-                  >
-                    Excluir viagem
-                  </button>
-                </div>
+                    <label>Hospedagem</label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Hotel no centro"
+                      value={currentTrip.accommodation || ""}
+                      onChange={(e) =>
+                        handleEditChange("accommodation", e.target.value)
+                      }
+                    />
+
+                    <label>Notas</label>
+                    <textarea
+                      placeholder="Observações sobre a viagem"
+                      value={currentTrip.notes || ""}
+                      onChange={(e) => handleEditChange("notes", e.target.value)}
+                    />
+
+                    <button
+                      className="delete-btn"
+                      onClick={() => deleteTrip(trip.id)}
+                    >
+                      Excluir viagem
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           );
