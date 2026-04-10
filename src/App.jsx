@@ -21,9 +21,6 @@ function App() {
       .from("trips")
       .select("*")
       .order("id", { ascending: false });
-    
-    console.log("data:", data);
-    console.log("error:", error);
 
     if (error) {
       console.error("Erro ao buscar viagens:", error.message);
@@ -56,6 +53,7 @@ function App() {
       alert("Preencha todos os campos.");
       return;
     }
+
     if (new Date(endDate) <= new Date(startDate)) {
       alert("A data final deve ser maior que a data de início.");
       return;
@@ -100,131 +98,117 @@ function App() {
     fetchTrips();
   };
 
-  const updateTripField = async (tripId, field, value) => {
-    const columnMap = {
-      accommodation: "accommodation",
-      notes: "notes",
-      status: "status",
-      budget: "budget",
-      destination: "destination",
-    };
+  const saveTripEdits = async (updatedTrip) => {
+    if (
+      !updatedTrip.destination ||
+      !updatedTrip.startDate ||
+      !updatedTrip.endDate ||
+      !updatedTrip.budget ||
+      !updatedTrip.status
+    ) {
+      alert("Preencha todos os campos obrigatórios da viagem.");
+      return { success: false };
+    }
 
-    const dbField = columnMap[field];
-    if (!dbField) return;
+    if (new Date(updatedTrip.endDate) <= new Date(updatedTrip.startDate)) {
+      alert("A data final deve ser maior que a data de início.");
+      return { success: false };
+    }
 
     const { error } = await supabase
       .from("trips")
-      .update({ [dbField]: value })
-      .eq("id", tripId);
+      .update({
+        destination: updatedTrip.destination,
+        start_date: updatedTrip.startDate,
+        end_date: updatedTrip.endDate,
+        budget: updatedTrip.budget,
+        status: updatedTrip.status,
+        airline: updatedTrip.transport?.airline || "",
+        accommodation: updatedTrip.accommodation || "",
+        notes: updatedTrip.notes || "",
+      })
+      .eq("id", updatedTrip.id);
 
     if (error) {
-      console.error("Erro ao atualizar viagem:", error.message);
-      return;
+      console.error("Erro ao salvar alterações:", error.message);
+      alert("Não foi possível salvar as alterações.");
+      return { success: false };
     }
 
     setTrips((prevTrips) =>
-      prevTrips.map((trip) =>
-        trip.id === tripId ? { ...trip, [field]: value } : trip
-      )
+      prevTrips.map((trip) => (trip.id === updatedTrip.id ? updatedTrip : trip))
     );
+
+    return { success: true };
   };
 
-  const updateTransportField = async (tripId, field, value) => {
-    if (field !== "airline") return;
+  return (
+    <div className="app">
+      <header className="header">
+        <div>
+          <p className="mini-title">Travel Planner</p>
+          <h1>Organize suas viagens com visual profissional</h1>
+          <p className="header-subtitle">
+            Planeje destinos, orçamento, datas e detalhes em um só lugar.
+          </p>
+        </div>
 
-    const { error } = await supabase
-      .from("trips")
-      .update({ airline: value })
-      .eq("id", tripId);
+        <button
+          className="header-btn"
+          onClick={() =>
+            document
+              .querySelector(".form-section")
+              ?.scrollIntoView({ behavior: "smooth" })
+          }
+        >
+          + Nova viagem
+        </button>
+      </header>
 
-    if (error) {
-      console.error("Erro ao atualizar companhia aérea:", error.message);
-      return;
-    }
+      <section className="dashboard">
+        <div className="dashboard-card">
+          <span>Total de viagens</span>
+          <strong>{trips.length}</strong>
+        </div>
 
-    setTrips((prevTrips) =>
-      prevTrips.map((trip) =>
-        trip.id === tripId
-          ? {
-              ...trip,
-              transport: {
-                ...trip.transport,
-                airline: value,
-              },
-            }
-          : trip
-      )
-    );
-  };
+        <div className="dashboard-card">
+          <span>Planejadas</span>
+          <strong>
+            {trips.filter((trip) => trip.status === "Planejada").length}
+          </strong>
+        </div>
 
-  const addAttraction = () => {};
-  const removeAttraction = () => {};
-  const addRestaurant = () => {};
-  const removeRestaurant = () => {};
+        <div className="dashboard-card">
+          <span>Reservadas</span>
+          <strong>
+            {trips.filter((trip) => trip.status === "Reservada").length}
+          </strong>
+        </div>
+      </section>
 
-return (
-  <div className="app">
-    <header className="header">
-      <div>
-        <p className="mini-title">Travel Planner</p>
-        <h1>Organize suas viagens com visual profissional</h1>
-        <p className="header-subtitle">
-          Planeje destinos, orçamento, datas e detalhes em um só lugar.
-        </p>
-      </div>
+      <main className="container">
+        <TripForm
+          destination={destination}
+          setDestination={setDestination}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
+          budget={budget}
+          setBudget={setBudget}
+          status={status}
+          setStatus={setStatus}
+          addTrip={addTrip}
+        />
 
-      <button className="header-btn">+ Nova viagem</button>
-    </header>
-
-    <section className="dashboard">
-      <div className="dashboard-card">
-        <span>Total de viagens</span>
-        <strong>{trips.length}</strong>
-      </div>
-
-      <div className="dashboard-card">
-        <span>Planejadas</span>
-        <strong>
-          {trips.filter((trip) => trip.status === "Planejada").length}
-        </strong>
-      </div>
-
-      <div className="dashboard-card">
-        <span>Reservadas</span>
-        <strong>
-          {trips.filter((trip) => trip.status === "Reservada").length}
-        </strong>
-      </div>
-    </section>
-
-    <main className="container">
-      <TripForm
-        destination={destination}
-        setDestination={setDestination}
-        startDate={startDate}
-        setStartDate={setStartDate}
-        endDate={endDate}
-        setEndDate={setEndDate}
-        budget={budget}
-        setBudget={setBudget}
-        status={status}
-        setStatus={setStatus}
-        addTrip={addTrip}
-      />
-
-      <TripList
-        trips={trips}
-        deleteTrip={deleteTrip}
-        updateTripField={updateTripField}
-        updateTransportField={updateTransportField}
-        addAttraction={addAttraction}
-        removeAttraction={removeAttraction}
-        addRestaurant={addRestaurant}
-        removeRestaurant={removeRestaurant}
-      />
-    </main>
-  </div>
-);
+        <TripList
+          trips={trips}
+          deleteTrip={deleteTrip}
+          saveTripEdits={saveTripEdits}
+        />
+      </main>
+    </div>
+  );
 }
 
 export default App;

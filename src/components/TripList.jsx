@@ -1,24 +1,20 @@
 import { useState } from "react";
 
-function TripList({
-  trips,
-  deleteTrip,
-  updateTripField,
-
-  updateTransportField,
-}) {
+function TripList({ trips, deleteTrip, saveTripEdits }) {
   const [openTripId, setOpenTripId] = useState(null);
+  const [editingTripId, setEditingTripId] = useState(null);
+  const [editedTrip, setEditedTrip] = useState(null);
 
   const formatCurrencyBRL = (value) => {
-  const numericValue = Number(value);
+    const numericValue = Number(value);
 
-  if (Number.isNaN(numericValue)) return "R$ 0,00";
+    if (Number.isNaN(numericValue)) return "R$ 0,00";
 
-  return numericValue.toLocaleString("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  });
-};
+    return numericValue.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
 
   const calculateTripDays = (startDate, endDate) => {
     if (!startDate || !endDate) return 0;
@@ -46,7 +42,75 @@ function TripList({
   };
 
   const toggleTripDetails = (tripId) => {
+    if (editingTripId === tripId) return;
     setOpenTripId(openTripId === tripId ? null : tripId);
+  };
+
+  const startEditing = (trip) => {
+    setOpenTripId(trip.id);
+    setEditingTripId(trip.id);
+    setEditedTrip({
+      ...trip,
+      transport: {
+        airline: trip.transport?.airline || "",
+      },
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingTripId(null);
+    setEditedTrip(null);
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditedTrip((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleAirlineChange = (value) => {
+    setEditedTrip((prev) => ({
+      ...prev,
+      transport: {
+        ...prev.transport,
+        airline: value,
+      },
+    }));
+  };
+
+  const getMinEndDate = (startDate) => {
+    if (!startDate) return "";
+
+    const nextDay = new Date(startDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    return nextDay.toISOString().split("T")[0];
+  };
+
+  const handleStartDateChange = (value) => {
+    setEditedTrip((prev) => {
+      const updated = { ...prev, startDate: value };
+
+      if (
+        updated.endDate &&
+        value &&
+        new Date(updated.endDate) <= new Date(value)
+      ) {
+        updated.endDate = "";
+      }
+
+      return updated;
+    });
+  };
+
+  const handleSave = async () => {
+    const result = await saveTripEdits(editedTrip);
+
+    if (result.success) {
+      setEditingTripId(null);
+      setEditedTrip(null);
+    }
   };
 
   return (
@@ -56,82 +120,192 @@ function TripList({
       {trips.length === 0 ? (
         <p>Nenhuma viagem adicionada ainda.</p>
       ) : (
-        trips.map((trip) => (
-          <div key={trip.id} className="trip-card">
-            <div className="trip-card-header">
-              <div>
-                <h3>{trip.destination}</h3>
-                <p className="trip-duration">
-                  {calculateTripDays(trip.startDate, trip.endDate)} dias de viagem
+        trips.map((trip) => {
+          const isOpen = openTripId === trip.id;
+          const isEditing = editingTripId === trip.id;
+          const currentTrip = isEditing ? editedTrip : trip;
+
+          return (
+            <div key={trip.id} className="trip-card">
+              <div className="trip-card-header">
+                <div>
+                  <h3>{trip.destination}</h3>
+                  <p className="trip-duration">
+                    {calculateTripDays(trip.startDate, trip.endDate)} dias de viagem
+                  </p>
+                </div>
+
+                <span className={getStatusClass(trip.status)}>{trip.status}</span>
+              </div>
+
+              <div className="trip-info-grid">
+                <p>
+                  <strong>Início:</strong> {trip.startDate}
+                </p>
+                <p>
+                  <strong>Fim:</strong> {trip.endDate}
+                </p>
+                <p>
+                  <strong>Orçamento:</strong> {formatCurrencyBRL(trip.budget)}
+                </p>
+                <p>
+                  <strong>Status:</strong> {trip.status}
                 </p>
               </div>
 
-              <span className={getStatusClass(trip.status)}>
-                {trip.status}
-              </span>
-            </div>
+              {!isOpen ? (
+                <button
+                  className="toggle-btn"
+                  onClick={() => toggleTripDetails(trip.id)}
+                >
+                  Ver detalhes
+                </button>
+              ) : (
+                <div className="card-actions">
+                  {!isEditing ? (
+                    <>
+                      <button
+                        className="toggle-btn"
+                        onClick={() => toggleTripDetails(trip.id)}
+                      >
+                        Fechar detalhes
+                      </button>
 
-            <div className="trip-info-grid">
-              <p><strong>Início:</strong> {trip.startDate}</p>
-              <p><strong>Fim:</strong> {trip.endDate}</p>
-              <p><strong>Orçamento:</strong> {formatCurrencyBRL(trip.budget)}</p>
-            </div>
+                      <button
+                        className="edit-btn"
+                        onClick={() => startEditing(trip)}
+                      >
+                        Editar viagem
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button className="save-btn" onClick={handleSave}>
+                        Salvar alterações
+                      </button>
 
-            <button
-              className="toggle-btn"
-              onClick={() => toggleTripDetails(trip.id)}
-            >
-              {openTripId === trip.id ? "Fechar detalhes" : "Ver detalhes"}
-            </button>
+                      <button className="cancel-btn" onClick={cancelEditing}>
+                        Cancelar
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
 
-            {openTripId === trip.id && (
-              <>
+              {isOpen && !isEditing && (
                 <div className="trip-details">
-                  <h4>Planejamento</h4>
+                  <h4>Detalhes da viagem</h4>
+
+                  <p>
+                    <strong>Companhia aérea:</strong>{" "}
+                    {trip.transport?.airline || "Não informada"}
+                  </p>
+
+                  <p>
+                    <strong>Hospedagem:</strong>{" "}
+                    {trip.accommodation || "Não informada"}
+                  </p>
+
+                  <p>
+                    <strong>Notas:</strong> {trip.notes || "Sem observações"}
+                  </p>
+
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteTrip(trip.id)}
+                  >
+                    Excluir viagem
+                  </button>
+                </div>
+              )}
+
+              {isOpen && isEditing && currentTrip && (
+                <div className="trip-details">
+                  <h4>Editar viagem</h4>
+
+                  <label>Destino</label>
+                  <input
+                    type="text"
+                    value={currentTrip.destination || ""}
+                    onChange={(e) =>
+                      handleEditChange("destination", e.target.value)
+                    }
+                  />
+
+                  <label>Data de início</label>
+                  <input
+                    type="date"
+                    value={currentTrip.startDate || ""}
+                    onChange={(e) => handleStartDateChange(e.target.value)}
+                  />
+
+                  <label>Data de fim</label>
+                  <input
+                    type="date"
+                    value={currentTrip.endDate || ""}
+                    min={getMinEndDate(currentTrip.startDate)}
+                    disabled={!currentTrip.startDate}
+                    onChange={(e) => handleEditChange("endDate", e.target.value)}
+                  />
+
+                  <label>Orçamento</label>
+                  <input
+                    type="number"
+                    placeholder="Ex: 3500"
+                    value={currentTrip.budget || ""}
+                    onChange={(e) => handleEditChange("budget", e.target.value)}
+                  />
+
+                  <label>Status</label>
+                  <select
+                    value={currentTrip.status || ""}
+                    onChange={(e) => handleEditChange("status", e.target.value)}
+                  >
+                    <option value="">Selecione o status</option>
+                    <option value="Planejada">Planejada</option>
+                    <option value="Reservada">Reservada</option>
+                    <option value="Concluída">Concluída</option>
+                  </select>
 
                   <label>Companhia aérea</label>
                   <input
                     type="text"
                     placeholder="Ex: LATAM"
-                    value={trip.transport?.airline || ""}
-                    onChange={(e) =>
-                      updateTransportField(trip.id, "airline", e.target.value)
-                    }
+                    value={currentTrip.transport?.airline || ""}
+                    onChange={(e) => handleAirlineChange(e.target.value)}
                   />
 
                   <label>Hospedagem</label>
                   <input
                     type="text"
                     placeholder="Ex: Hotel no centro"
-                    value={trip.accommodation || ""}
+                    value={currentTrip.accommodation || ""}
                     onChange={(e) =>
-                      updateTripField(trip.id, "accommodation", e.target.value)
+                      handleEditChange("accommodation", e.target.value)
                     }
                   />
 
                   <label>Notas</label>
                   <textarea
                     placeholder="Observações sobre a viagem"
-                    value={trip.notes || ""}
-                    onChange={(e) =>
-                      updateTripField(trip.id, "notes", e.target.value)
-                    }
+                    value={currentTrip.notes || ""}
+                    onChange={(e) => handleEditChange("notes", e.target.value)}
                   />
-                </div>
 
-                <button
-                  className="delete-btn"
-                  onClick={() => deleteTrip(trip.id)}
-                >
-                  Excluir viagem
-                </button>
-              </>
-            )}
-          </div>
-        ))
+                  <button
+                    className="delete-btn"
+                    onClick={() => deleteTrip(trip.id)}
+                  >
+                    Excluir viagem
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })
       )}
     </section>
   );
 }
 
-export default TripList; 
+export default TripList;
