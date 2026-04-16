@@ -147,7 +147,7 @@ function App() {
       <header className="header">
         <div>
           <p className="mini-title">Travel Planner</p>
-          <h1>Organize suas viagens com visual profissional</h1>
+          <h1>Organize suas viagens!</h1>
           <p className="header-subtitle">
             Planeje destinos, orçamento, datas e detalhes em um só lugar.
           </p>
